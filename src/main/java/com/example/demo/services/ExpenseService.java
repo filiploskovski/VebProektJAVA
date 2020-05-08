@@ -107,10 +107,15 @@ public class ExpenseService implements IExpense {
     public List<ExpenseModel> getDailyExpense() {
         List<Integer> accountIds = _accountRepository.findAllByUserId(claimsService.GetUserIdFromToken()).stream().map(x -> x.getId()).collect(Collectors.toList());
 
-        LocalDate localDate = LocalDate.now();
-        Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+//        LocalDate localDate = LocalDate.now();
+//        Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-        return _expenseRepository.findAllByAccountIdInAndDate(accountIds,date).stream().map(x ->
+        LocalDate startlocalDate = LocalDate.now();
+        LocalDate endlocalDate = LocalDate.now().plusDays(1);
+        Date startdate = Date.from(startlocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        Date enddate = Date.from(endlocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        return _expenseRepository.findAllByAccountIdInAndDateIsBetween(accountIds,startdate,enddate).stream().map(x ->
                 new ExpenseModel(x.getId(),x.getAccountId(),x.getAccount().getName(),x.getExpenseTypeId(),x.getExpenseType().getName(),x.getAmount(),x.getDate(),x.getName()))
                 .collect(Collectors.toList());
     }
@@ -120,10 +125,16 @@ public class ExpenseService implements IExpense {
         List<Integer> accountIds = _accountRepository.findAllByUserId(claimsService.GetUserIdFromToken())
                 .stream().map(x -> x.getId()).collect(Collectors.toList());
 
-        LocalDate localDate = LocalDate.now();
-        Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+//        LocalDate localDate = LocalDate.now();
+//        Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        LocalDate startlocalDate = LocalDate.now();
+        LocalDate endlocalDate = LocalDate.now().plusDays(1);
+        Date startdate = Date.from(startlocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        Date enddate = Date.from(endlocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
 
         return (float)_expenseRepository
-                .findAllByAccountIdInAndDate(accountIds,date).stream().mapToDouble(x -> x.getAmount()).sum();
+                .findAllByAccountIdInAndDateIsBetween(accountIds,startdate,enddate).stream().mapToDouble(x -> x.getAmount()).sum();
     }
 }

@@ -10,5 +10,6 @@ import java.util.List;
 @Repository
 public interface IExpenseRepository extends JpaRepository<Expense,Integer> {
     Expense findFirstById(int id);
-    List<Expense> findAllByAccountIdInAndDate(List<Integer> accountId, Date date);
+    //List<Expense> findAllByAccountIdInAndDate(List<Integer> accountId, Date date);
+    List<Expense> findAllByAccountIdInAndDateIsBetween(List<Integer> accountId, Date startDate, Date endDate);
 }
