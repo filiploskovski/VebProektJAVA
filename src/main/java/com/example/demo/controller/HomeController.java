@@ -17,7 +17,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/home")
-@CrossOrigin(origins = "http://localhost:4200")
 public class HomeController {
 
     private final IAccount _account;
@@ -35,7 +34,7 @@ public class HomeController {
     @GetMapping
     @RequestMapping("/dashboard")
     public DashboardModel get(){
-        List<AccountModel> accounts = _account.get();
+        List<AccountModel> accounts = _account.getByUserId();
         List<IncomeModel> income = _income.getTopThreeByDate();
         float dailyExpense = _expense.getDailyExpenseSum();
         List<ExpenseModel> expense = _expense.getDailyExpense();

@@ -9,7 +9,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/account-type")
-@CrossOrigin(origins = "http://localhost:4200")
 public class AccountTypeController {
 
     private final IAccountType _IAccountType;
@@ -22,7 +21,7 @@ public class AccountTypeController {
     @GetMapping
     @RequestMapping("/get")
     public List<AccountTypeModel> get(){
-        return _IAccountType.get();
+        return _IAccountType.getByUserId();
     }
 
     @PostMapping
@@ -40,8 +39,8 @@ public class AccountTypeController {
     public void update(@RequestBody AccountTypeModel model) {_IAccountType.update(model);}
 
     @DeleteMapping
-    public void delete(@RequestBody AccountTypeModel model){
-        _IAccountType.delete(model);
+    public void delete(@RequestParam int id){
+        _IAccountType.delete(id);
     }
 
 

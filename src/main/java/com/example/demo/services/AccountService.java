@@ -1,5 +1,6 @@
 package com.example.demo.services;
 
+import com.example.demo.JWT.ClaimsService;
 import com.example.demo.entities.Account;
 import com.example.demo.interfaces.IAccount;
 import com.example.demo.models.AccountModel;
@@ -16,10 +17,12 @@ import java.util.stream.Collectors;
 public class AccountService implements IAccount {
 
     private final IAccountRepository _IAccountRepository;
+    private final ClaimsService claimsService;
 
     @Autowired
-    public AccountService(IAccountRepository iAccountRepository) {
+    public AccountService(IAccountRepository iAccountRepository, ClaimsService claimsService) {
         _IAccountRepository = iAccountRepository;
+        this.claimsService = claimsService;
     }
 
     @Override
@@ -34,8 +37,8 @@ public class AccountService implements IAccount {
     }
 
     @Override
-    public List<AccountModel> getByUserId(int userId) {
-        return _IAccountRepository.findAllByUserId(userId).stream().map(x ->
+    public List<AccountModel> getByUserId() {
+        return _IAccountRepository.findAllByUserId(claimsService.GetUserIdFromToken()).stream().map(x ->
                 new AccountModel(x.getId(),
                         x.getAccountTypeId(),
                         x.getAccountType().getName(),
@@ -67,7 +70,7 @@ public class AccountService implements IAccount {
         entity.setAccountTypeId(model.getAccountTypeId());
         entity.setDefault(model.isDefault());
         entity.setAmount(model.getAmount());
-        entity.setUserId(1);
+        entity.setUserId(claimsService.GetUserIdFromToken());
         entity.setName(model.getName());
 
         _IAccountRepository.save(entity);
@@ -79,13 +82,13 @@ public class AccountService implements IAccount {
         entity.setAccountTypeId(model.getAccountTypeId());
         entity.setDefault(model.isDefault());
         entity.setAmount(model.getAmount());
-        entity.setUserId(1);
+        entity.setUserId(claimsService.GetUserIdFromToken());
         entity.setName(model.getName());
         _IAccountRepository.save(entity);
     }
 
     @Override
-    public void delete(AccountModel model) {
+    public void delete(int id) {
 
     }
 }

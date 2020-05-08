@@ -1,5 +1,6 @@
 package com.example.demo.services;
 
+import com.example.demo.JWT.ClaimsService;
 import com.example.demo.entities.Account;
 import com.example.demo.entities.Expense;
 import com.example.demo.interfaces.IExpense;
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,11 +21,14 @@ public class ExpenseService implements IExpense {
 
     private final IExpenseRepository _expenseRepository;
     private final IAccountRepository _accountRepository;
+    private final ClaimsService claimsService;
+
 
     @Autowired
-    public ExpenseService(IExpenseRepository _expenseRepository, IAccountRepository accountRepository) {
+    public ExpenseService(IExpenseRepository _expenseRepository, IAccountRepository accountRepository, ClaimsService claimsService) {
         this._expenseRepository = _expenseRepository;
         _accountRepository = accountRepository;
+        this.claimsService = claimsService;
     }
 
     @Override
@@ -36,7 +39,7 @@ public class ExpenseService implements IExpense {
     }
 
     @Override
-    public List<ExpenseModel> getByUserId(int userId) {
+    public List<ExpenseModel> getByUserId() {
         return null;
     }
 
@@ -69,7 +72,12 @@ public class ExpenseService implements IExpense {
     }
 
     @Override
-    public void delete(ExpenseModel model) {
+    public void delete(int id) {
+        Expense expense = _expenseRepository.findFirstById(id);
+        Account account = _accountRepository.findFirstById(expense.getAccountId());
+        account.setAmount(account.getAmount() + expense.getAmount());
+        _accountRepository.save(account);
+        _expenseRepository.delete(expense);
     }
 
 
@@ -97,8 +105,7 @@ public class ExpenseService implements IExpense {
 
     @Override
     public List<ExpenseModel> getDailyExpense() {
-        //TODO: UserId
-        List<Integer> accountIds = _accountRepository.findAllByUserId(1).stream().map(x -> x.getId()).collect(Collectors.toList());
+        List<Integer> accountIds = _accountRepository.findAllByUserId(claimsService.GetUserIdFromToken()).stream().map(x -> x.getId()).collect(Collectors.toList());
 
         LocalDate localDate = LocalDate.now();
         Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
@@ -110,8 +117,7 @@ public class ExpenseService implements IExpense {
 
     @Override
     public float getDailyExpenseSum() {
-        //TODO: UserId
-        List<Integer> accountIds = _accountRepository.findAllByUserId(1)
+        List<Integer> accountIds = _accountRepository.findAllByUserId(claimsService.GetUserIdFromToken())
                 .stream().map(x -> x.getId()).collect(Collectors.toList());
 
         LocalDate localDate = LocalDate.now();

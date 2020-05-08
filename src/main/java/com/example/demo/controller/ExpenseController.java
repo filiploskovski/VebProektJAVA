@@ -9,7 +9,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/expense")
-@CrossOrigin(origins = "http://localhost:4200")
 public class ExpenseController {
 
     private final IExpense _IExpense;
@@ -42,6 +41,7 @@ public class ExpenseController {
     }
 
     @DeleteMapping
-    public void delete(@RequestBody ExpenseModel model){
+    public void delete(@RequestParam int id){
+        _IExpense.delete(id);
     }
 }

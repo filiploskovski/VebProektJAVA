@@ -9,7 +9,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/income-type")
-@CrossOrigin(origins = "http://localhost:4200")
 public class IncomeTypeController {
 
     private final IIncomeType _IIncomeType;
@@ -22,7 +21,7 @@ public class IncomeTypeController {
     @GetMapping
     @RequestMapping("/get")
     public List<IncomeTypeModel> get(){
-        return _IIncomeType.get();
+        return _IIncomeType.getByUserId();
     }
 
     @PostMapping
@@ -42,7 +41,7 @@ public class IncomeTypeController {
     }
 
     @DeleteMapping
-    public void delete(@RequestBody IncomeTypeModel model){
-        //_IIncomeType.insert(model);
+    public void delete(@RequestParam int id){
+        _IIncomeType.delete(id);
     }
 }

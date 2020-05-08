@@ -10,7 +10,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/expense-type")
-@CrossOrigin(origins = "http://localhost:4200")
 public class ExpenseTypeController {
 
     private final IExpenseType _expenseTypeService;
@@ -24,7 +23,7 @@ public class ExpenseTypeController {
     @GetMapping
     @RequestMapping("/get")
     public List<ExpenseTypeModel> get(){
-        return _expenseTypeService.get();
+        return _expenseTypeService.getByUserId();
     }
 
     @GetMapping
@@ -42,8 +41,8 @@ public class ExpenseTypeController {
     public void update(@RequestBody ExpenseTypeModel model) {_expenseTypeService.update(model);}
 
     @DeleteMapping
-    public void delete(@RequestBody ExpenseTypeModel model){
-        _expenseTypeService.delete(model);
+    public void delete(@RequestParam int id){
+        _expenseTypeService.delete(id);
     }
 
 

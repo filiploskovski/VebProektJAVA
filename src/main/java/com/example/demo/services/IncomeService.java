@@ -1,5 +1,6 @@
 package com.example.demo.services;
 
+import com.example.demo.JWT.ClaimsService;
 import com.example.demo.entities.Account;
 import com.example.demo.entities.Income;
 import com.example.demo.interfaces.IIncome;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Service;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,11 +22,14 @@ public class IncomeService implements IIncome {
 
     private final IIncomeRepository _incomeRepository;
     private final IAccountRepository _IAccountRepository;
+    private final ClaimsService claimsService;
+
 
     @Autowired
-    public IncomeService(IIncomeRepository incomeRepository, IAccountRepository iAccountRepository) {
+    public IncomeService(IIncomeRepository incomeRepository, IAccountRepository iAccountRepository, ClaimsService claimsService) {
         _incomeRepository = incomeRepository;
         _IAccountRepository = iAccountRepository;
+        this.claimsService = claimsService;
     }
 
     @Override
@@ -38,13 +41,8 @@ public class IncomeService implements IIncome {
     }
 
     @Override
-    public List<IncomeModel> getByUserId(int userId) {
-        //TODO: Get all accounts by user
-
-        return _incomeRepository.findAll().stream().map(x ->
-                new IncomeModel(x.getId(),x.getAccountId(),"",x.getIncomeTypeId(),
-                        x.getIncomeType().getName(),x.getAmount(),x.getDate(),x.getMonthly(),x.getName()))
-                .collect(Collectors.toList());
+    public List<IncomeModel> getByUserId() {
+        return null;
     }
 
     @Override
@@ -78,7 +76,36 @@ public class IncomeService implements IIncome {
     }
 
     @Override
-    public void delete(IncomeModel model) {
+    public void delete(int id) {
+        Income income = _incomeRepository.findFirstById(id);
+        Account account = _IAccountRepository.findFirstById(income.getAccountId());
+        account.setAmount(account.getAmount() - income.getAmount());
+        _IAccountRepository.save(account);
+        _incomeRepository.delete(income);
+    }
+
+    @Override
+    public List<IncomeModel> getTopThreeByDate() {
+        List<Integer> accountIds = _IAccountRepository.findAllByUserId(claimsService.GetUserIdFromToken()).stream().map(x -> x.getId()).collect(Collectors.toList());
+
+        return _incomeRepository.findAllByAccountIdInOrderByDateDesc(accountIds).stream().map(x -> new IncomeModel(x.getId(),x.getAccountId(),"",x.getIncomeTypeId(),
+                x.getIncomeType().getName(),x.getAmount(),x.getDate(),x.getMonthly(),x.getName())).limit(3).collect(Collectors.toList());
+    }
+
+    @Override
+    public float getMonthlyIncome() {
+        List<Integer> accountIds = _IAccountRepository.findAllByUserId(claimsService.GetUserIdFromToken()).stream().map(x -> x.getId()).collect(Collectors.toList());
+
+        LocalDate todayDate = LocalDate.now().withDayOfMonth(1);
+
+        int lstDay = Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH);
+        LocalDate lastDate = LocalDate.now().withDayOfMonth(lstDay);
+
+       return (float) _incomeRepository.findAllByAccountIdInAndDateBetween(accountIds,
+                Date.from(todayDate.atStartOfDay(ZoneId.systemDefault()).toInstant()),
+                Date.from(lastDate.atStartOfDay(ZoneId.systemDefault()).toInstant()))
+                .stream().mapToDouble(x -> x.getAmount()).sum();
+
     }
 
     private void IncomeToAccount(IncomeModel model, int accountId){
@@ -98,31 +125,5 @@ public class IncomeService implements IIncome {
             }
         }
         _IAccountRepository.save(account);
-    }
-
-    @Override
-    public List<IncomeModel> getTopThreeByDate() {
-        //TODO: UserId
-        List<Integer> accountIds = _IAccountRepository.findAllByUserId(1).stream().map(x -> x.getId()).collect(Collectors.toList());
-
-        return _incomeRepository.findAllByAccountIdInOrderByDateDesc(accountIds).stream().map(x -> new IncomeModel(x.getId(),x.getAccountId(),"",x.getIncomeTypeId(),
-                x.getIncomeType().getName(),x.getAmount(),x.getDate(),x.getMonthly(),x.getName())).limit(3).collect(Collectors.toList());
-    }
-
-    @Override
-    public float getMonthlyIncome() {
-        //TODO: UserId
-        List<Integer> accountIds = _IAccountRepository.findAllByUserId(1).stream().map(x -> x.getId()).collect(Collectors.toList());
-
-        LocalDate todayDate = LocalDate.now().withDayOfMonth(1);
-
-        int lstDay = Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH);
-        LocalDate lastDate = LocalDate.now().withDayOfMonth(lstDay);
-
-       return (float) _incomeRepository.findAllByAccountIdInAndDateBetween(accountIds,
-                Date.from(todayDate.atStartOfDay(ZoneId.systemDefault()).toInstant()),
-                Date.from(lastDate.atStartOfDay(ZoneId.systemDefault()).toInstant()))
-                .stream().mapToDouble(x -> x.getAmount()).sum();
-
     }
 }

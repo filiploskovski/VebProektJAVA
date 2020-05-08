@@ -10,7 +10,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/account")
-@CrossOrigin(origins = "http://localhost:4200")
 public class AccountController {
 
     private final IAccount _IAccount;
@@ -23,7 +22,7 @@ public class AccountController {
     @GetMapping
     @RequestMapping("/get")
     public List<AccountModel> get(){
-        return _IAccount.get();
+        return _IAccount.getByUserId();
     }
 
     @PostMapping
@@ -43,7 +42,7 @@ public class AccountController {
     }
 
     @DeleteMapping
-    public void delete(@RequestBody AccountModel model){
+    public void delete(@RequestParam int id){
 
     }
 }

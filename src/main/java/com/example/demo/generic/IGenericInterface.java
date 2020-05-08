@@ -4,11 +4,11 @@ import java.util.List;
 
 public interface IGenericInterface<T> {
     List<T> get();
-    List<T> getByUserId(int userId);
+    List<T> getByUserId();
     T getById(int id);
     void insert(T model);
     void update(T model);
-    void delete(T model);
+    void delete(int id);
 
 
 }

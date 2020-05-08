@@ -15,9 +15,6 @@ public class User {
     @Column(name = "password")
     private String password;
 
-    @Column(name = "password_salt")
-    private String passwordSalt;
-
     @Column(name = "username")
     private String username;
 
@@ -59,14 +56,6 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getPasswordSalt() {
-        return passwordSalt;
-    }
-
-    public void setPasswordSalt(String passwordSalt) {
-        this.passwordSalt = passwordSalt;
     }
 
     public String getUsername() {

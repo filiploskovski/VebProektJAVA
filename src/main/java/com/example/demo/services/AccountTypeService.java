@@ -1,5 +1,6 @@
 package com.example.demo.services;
 
+import com.example.demo.JWT.ClaimsService;
 import com.example.demo.entities.AccountType;
 import com.example.demo.interfaces.IAccountType;
 import com.example.demo.models.AccountTypeModel;
@@ -14,10 +15,12 @@ import java.util.stream.Collectors;
 public class AccountTypeService implements IAccountType {
 
     private final AccountTypeRepository _AccountTypeRepository;
+    private final ClaimsService claimsService;
 
     @Autowired
-    public AccountTypeService(AccountTypeRepository accountTypeRepository) {
+    public AccountTypeService(AccountTypeRepository accountTypeRepository, ClaimsService claimsService) {
         _AccountTypeRepository = accountTypeRepository;
+        this.claimsService = claimsService;
     }
 
     @Override
@@ -28,8 +31,8 @@ public class AccountTypeService implements IAccountType {
     }
 
     @Override
-    public List<AccountTypeModel> getByUserId(int userId) {
-        return _AccountTypeRepository.findAllByUserId(userId).stream()
+    public List<AccountTypeModel> getByUserId() {
+        return _AccountTypeRepository.findAllByUserId(claimsService.GetUserIdFromToken()).stream()
                 .map(x -> new AccountTypeModel(x.getId(),x.getUserId(),x.getName()))
                 .collect(Collectors.toList());
     }
@@ -43,7 +46,7 @@ public class AccountTypeService implements IAccountType {
     @Override
     public void insert(AccountTypeModel model) {
         AccountType entity = new AccountType(model.getName());
-        entity.setUserId(1);
+        entity.setUserId(claimsService.GetUserIdFromToken());
         _AccountTypeRepository.save(entity);
     }
 
@@ -55,6 +58,9 @@ public class AccountTypeService implements IAccountType {
     }
 
     @Override
-    public void delete(AccountTypeModel model) {
+    public void delete(int id) {
+        AccountType entity = _AccountTypeRepository.findFirstById(id);
+        _AccountTypeRepository.delete(entity);
+
     }
 }

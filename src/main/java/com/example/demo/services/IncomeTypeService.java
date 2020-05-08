@@ -1,5 +1,6 @@
 package com.example.demo.services;
 
+import com.example.demo.JWT.ClaimsService;
 import com.example.demo.entities.IncomeType;
 import com.example.demo.interfaces.IIncomeType;
 import com.example.demo.models.IncomeTypeModel;
@@ -14,10 +15,12 @@ import java.util.stream.Collectors;
 public class IncomeTypeService implements IIncomeType {
 
     private final IncomeTypeRepository _inIncomeTypeRepository;
+    private final ClaimsService claimsService;
 
     @Autowired
-    public IncomeTypeService(IncomeTypeRepository inIncomeTypeRepository) {
+    public IncomeTypeService(IncomeTypeRepository inIncomeTypeRepository, ClaimsService claimsService) {
         _inIncomeTypeRepository = inIncomeTypeRepository;
+        this.claimsService = claimsService;
     }
 
     @Override
@@ -27,8 +30,8 @@ public class IncomeTypeService implements IIncomeType {
     }
 
     @Override
-    public List<IncomeTypeModel> getByUserId(int userId) {
-        return _inIncomeTypeRepository.findAllByUserId(userId).stream().map(x ->
+    public List<IncomeTypeModel> getByUserId() {
+        return _inIncomeTypeRepository.findAllByUserId(claimsService.GetUserIdFromToken()).stream().map(x ->
                 new IncomeTypeModel(x.getId(),x.getUserId(),x.getName())).collect(Collectors.toList());
     }
 
@@ -41,7 +44,7 @@ public class IncomeTypeService implements IIncomeType {
     @Override
     public void insert(IncomeTypeModel model) {
         IncomeType entity = new IncomeType(model.getName());
-        entity.setUserId(1);
+        entity.setUserId(claimsService.GetUserIdFromToken());
         _inIncomeTypeRepository.save(entity);
     }
 
@@ -53,6 +56,8 @@ public class IncomeTypeService implements IIncomeType {
     }
 
     @Override
-    public void delete(IncomeTypeModel model) {
+    public void delete(int id) {
+        IncomeType entity = _inIncomeTypeRepository.findFirstById(id);
+        _inIncomeTypeRepository.delete(entity);
     }
 }
