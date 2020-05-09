@@ -10,7 +10,11 @@ Vo slucaj taa baza da ne raboti portebno e da se odkomentira kodot vo applicatio
 startuvate lokalen wamp server na vasiot kompjuter
 
 
-Za da se pocne da se koristi aplikacijata (server) ima veke kreirano user so slednive username i password
-Username: test
-Password: testpass
+Za da se pocne da se koristi aplikacijata (server) ima veke kreirano dvajca korisnici so slednive username i password
+
+Username: Stefan
+Password: 123456
+
+Username: Filip
+Password: 123456789
 
