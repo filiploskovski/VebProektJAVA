@@ -40,7 +40,12 @@ public class ExpenseService implements IExpense {
 
     @Override
     public List<ExpenseModel> getByUserId() {
-        return null;
+        List<Integer> accountIds = _accountRepository.findAllByUserId(claimsService.GetUserIdFromToken()).stream().map(x -> x.getId()).collect(Collectors.toList());
+
+
+        return _expenseRepository.findAllByAccountIdIn(accountIds).stream().map(x ->
+                new ExpenseModel(x.getId(),x.getAccountId(),x.getAccount().getName(),x.getExpenseTypeId(),x.getExpenseType().getName(),x.getAmount(),x.getDate(),x.getName()))
+                .collect(Collectors.toList());
     }
 
     @Override

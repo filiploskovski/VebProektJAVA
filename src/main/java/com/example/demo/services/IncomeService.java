@@ -42,7 +42,11 @@ public class IncomeService implements IIncome {
 
     @Override
     public List<IncomeModel> getByUserId() {
-        return null;
+        List<Integer> accountIds = _IAccountRepository.findAllByUserId(claimsService.GetUserIdFromToken()).stream().map(x -> x.getId()).collect(Collectors.toList());
+        return _incomeRepository.findAllByAccountIdIn(accountIds).stream().map(x ->
+                new IncomeModel(x.getId(),x.getAccountId(),x.getAccount().getName(),x.getIncomeTypeId(),
+                        x.getIncomeType().getName(),x.getAmount(),x.getDate(),
+                        x.getMonthly(),x.getName())).collect(Collectors.toList());
     }
 
     @Override

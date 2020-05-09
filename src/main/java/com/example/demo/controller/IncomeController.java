@@ -19,7 +19,7 @@ public class IncomeController {
     @GetMapping
     @RequestMapping("/get")
     public List<IncomeModel> get(){
-        return _IIncome.get();
+        return _IIncome.getByUserId();
     }
 
     @PostMapping

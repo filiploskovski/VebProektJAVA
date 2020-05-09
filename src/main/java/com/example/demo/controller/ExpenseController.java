@@ -21,7 +21,7 @@ public class ExpenseController {
     @GetMapping
     @RequestMapping("/get")
     public List<ExpenseModel> get(){
-        return _IExpense.get();
+        return _IExpense.getByUserId();
     }
 
     @PostMapping

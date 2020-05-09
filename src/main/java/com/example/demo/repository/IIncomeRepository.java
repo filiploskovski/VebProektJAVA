@@ -9,9 +9,11 @@ import java.util.List;
 
 @Repository
 public interface IIncomeRepository extends JpaRepository<Income,Integer> {
-    //List<Income> findAllByUserId(int userId);
     List<Income> findAll();
     Income findFirstById(int id);
     List<Income> findAllByAccountIdInOrderByDateDesc(List<Integer> accountId);
     List<Income> findAllByAccountIdInAndDateBetween(List<Integer> accountId, Date startDate, Date endDate);
+    List<Income> findAllByAccountIdIn(List<Integer> accountId);
+
+
 }
